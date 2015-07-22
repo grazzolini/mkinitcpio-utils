@@ -38,7 +38,8 @@ build() {
 help() {
     cat <<HELPEOF
 This hook is a drop in replacement for the encrypt hook and also allows for an
-encrypted root device to be unlocked remotely over SSH. It DOES NOT perform any
+encrypted root device to be unlocked remotely over SSH. It works with both
+mkinitcpio-dropbear and mkinitcpio-tinyssh hooks. It DOES NOT perform any
 network interface configuration.
 
 Use this hook in combination with any early userspace networking hook, such as

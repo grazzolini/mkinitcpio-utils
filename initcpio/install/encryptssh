@@ -1,0 +1,49 @@
+#!/bin/bash
+make_etc_passwd() {
+    echo 'root:x:0:0:root:/:/bin/cryptsetup_shell' > "${TMPDIR}"/passwd
+    echo '/bin/cryptsetup_shell' > "${TMPDIR}"/shells
+    add_file "${TMPDIR}/passwd" "/etc/passwd"
+    add_file "${TMPDIR}/shells" "/etc/shells"
+    rm "${TMPDIR}/shells"
+    rm "${TMPDIR}/passwd"
+}
+
+
+build() {
+    local mod
+
+    add_module dm-crypt
+    if [[ $CRYPTO_MODULES ]]; then
+        for mod in $CRYPTO_MODULES; do
+            add_module "$mod"
+        done
+    else
+        add_all_modules '/crypto/'
+    fi
+
+    add_binary "cryptsetup"
+    add_binary "dmsetup"
+    add_file "/usr/lib/udev/rules.d/10-dm.rules"
+    add_file "/usr/lib/udev/rules.d/13-dm-disk.rules"
+    add_file "/usr/lib/udev/rules.d/95-dm-notify.rules"
+    add_file "/usr/lib/initcpio/udev/11-dm-initramfs.rules" "/usr/lib/udev/rules.d/11-dm-initramfs.rules"
+
+    add_binary "/usr/share/mkinitcpio-utils/utils/shells/cryptsetup_shell" "/bin/cryptsetup_shell"
+
+    make_etc_passwd
+
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+This hook is a drop in replacement for the encrypt hook and also allows for an
+encrypted root device to be unlocked remotely over SSH. It works with both
+mkinitcpio-dropbear and mkinitcpio-tinyssh hooks. It DOES NOT perform any
+network interface configuration.
+
+Use this hook in combination with any early userspace networking hook, such as
+mkinitcpio-netconf or mkinitcpio-ppp. Place this hook AFTER any network
+configuration hook and BEFORE the filesystems hook.
+HELPEOF
+}

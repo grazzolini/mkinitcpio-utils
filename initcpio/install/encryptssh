@@ -1,11 +1,7 @@
 #!/bin/bash
 make_etc_passwd() {
-    echo 'root:x:0:0:root:/:/bin/cryptsetup_shell' > "${TMPDIR}"/passwd
-    echo '/bin/cryptsetup_shell' > "${TMPDIR}"/shells
-    add_file "${TMPDIR}/passwd" "/etc/passwd"
-    add_file "${TMPDIR}/shells" "/etc/shells"
-    rm "${TMPDIR}/shells"
-    rm "${TMPDIR}/passwd"
+    echo 'root:x:0:0:root:/root:/bin/cryptsetup_shell' > "${BUILDROOT}"/etc/passwd
+    echo '/bin/cryptsetup_shell' > "${BUILDROOT}"/etc/shells
 }
 
 

@@ -67,11 +67,13 @@ run_hook ()
         done
         IFS="${OLDIFS}"
 
-        echo ${cryptdev} > /.cryptdev
         echo ${cryptname} > /.cryptname
         echo ${cryptargs} > /.cryptargs
 
         if resolved=$(resolve_device "${cryptdev}" ${rootdelay}); then
+
+            echo ${resolved} > /.cryptdev
+
             if /sbin/cryptsetup isLuks ${resolved} >/dev/null 2>&1; then
                 [ ${DEPRECATED_CRYPT} -eq 1 ] && warn_deprecated
                 dopassphrase=1
@@ -107,6 +109,10 @@ run_hook ()
 
                     if [ -f /.cryptname ]; then
                         rm /.cryptname
+                    fi
+
+                    if [ -f /.cryptargs ]; then
+                        rm /.cryptargs
                     fi
                 fi
                 if [ -e "/dev/mapper/${cryptname}" ]; then

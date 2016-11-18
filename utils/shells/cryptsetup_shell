@@ -3,6 +3,7 @@ if [ -c "/dev/mapper/control" ]; then
     if eval /sbin/cryptsetup luksOpen \`cat /.cryptdev\` \`cat /.cryptname\` \`cat /.cryptargs\` ; then
         echo > /.done
         killall cryptsetup
+        partprobe /dev/system/`cat /.cryptname`
     fi
 else
     echo "encryption bootup not succeeded. please wait!"

@@ -26,6 +26,9 @@ build() {
 
     add_binary "/usr/share/mkinitcpio-utils/utils/shells/cryptsetup_shell" "/bin/cryptsetup_shell"
 
+    # cryptsetup calls pthread_create(), which dlopen()s libgcc_s.so.1
+    add_binary "/usr/lib/libgcc_s.so.1"
+
     make_etc_passwd
 
     add_runscript

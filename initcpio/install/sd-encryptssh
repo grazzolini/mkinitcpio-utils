@@ -1,0 +1,29 @@
+#!/bin/bash
+make_etc_passwd() {
+    sed -i '/^root/ s|/bin/bash|/bin/cryptsetup_shell|' "${BUILDROOT}"/etc/passwd
+    echo '/bin/cryptsetup_shell' >> "${BUILDROOT}"/etc/shells
+}
+
+build() {
+    add_binary "/usr/share/mkinitcpio-utils/utils/shells/cryptsetup_shell_systemd" "/bin/cryptsetup_shell"
+    add_binary "/lib/systemd/systemd-reply-password"
+    add_binary "/usr/bin/stty"
+
+    make_etc_passwd
+}
+
+help() {
+    cat <<HELPEOF
+This hook is works *together with* the sd-encrypt hook and allows for an
+encrypted root device to be unlocked remotely over SSH. It works with both
+mkinitcpio-dropbear and mkinitcpio-tinyssh hooks. It DOES NOT perform any
+network interface configuration, and requires the sd-encrypt hook to do the
+actual cryptsetup step.
+
+Use this hook in combination with any early userspace networking hook, such as
+mkinitcpio-netconf or mkinitcpio-ppp. Place this hook AFTER any network
+configuration hook and BEFORE the sd-ecnrypt and filesystems hook.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

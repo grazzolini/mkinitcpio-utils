@@ -87,17 +87,23 @@ run_hook ()
                 fi
                 # Ask for a passphrase
                 if [ ${dopassphrase} -gt 0 ]; then
-                    echo ""
-                    echo "A password is required to access the ${cryptname} volume:"
+                    if command -v plymouth >/dev/null 2>&1 && plymouth --ping 2>/dev/null; then
+                        plymouth ask-for-password \
+                            --prompt="A password is required to access the ${cryptname} volume" \
+                            --command="/sbin/cryptsetup luksOpen ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}"
+                    else
+                        echo ""
+                        echo "A password is required to access the ${cryptname} volume:"
 
-                    #loop until we get a real password
-                    while ! eval /sbin/cryptsetup luksOpen ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; do
-                     if [ -f /.done ]; then
-                         break
-                     fi
+                        #loop until we get a real password
+                        while ! eval /sbin/cryptsetup luksOpen ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; do
+                            if [ -f /.done ]; then
+                                break
+                            fi
 
-                        sleep 2;
-                    done
+                            sleep 2;
+                        done
+                    fi
 
                     if [ -f /.done ]; then
                         rm /.done

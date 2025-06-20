@@ -47,6 +47,11 @@ run_hook ()
             cryptname="root"
         fi
 
+        if [ -b "/dev/mapper/${cryptname}" ]; then
+            echo "Device ${cryptname} already exists, not doing any crypt setup."
+            return 0
+        fi
+
         warn_deprecated() {
             echo "The syntax 'root=${root}' where '${root}' is an encrypted volume is deprecated"
             echo "Use 'cryptdevice=${root}:root root=/dev/mapper/root' instead."

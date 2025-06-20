@@ -65,6 +65,15 @@ run_hook ()
                     echo "Enabling TRIM/discard support."
                     cryptargs="${cryptargs} --allow-discards"
                     ;;
+                no-read-workqueue|perf-no_read_workqueue)
+                    cryptargs="${cryptargs} --perf-no_read_workqueue"
+                    ;;
+                no-write-workqueue|perf-no_write_workqueue)
+                    cryptargs="${cryptargs} --perf-no_write_workqueue"
+                    ;;
+                sector-size=*)
+                    cryptargs="${cryptargs} --sector-size ${cryptopt#*=}"
+                    ;;
                 *)
                     echo "Encryption option '${cryptopt}' not known, ignoring." >&2
                     ;;

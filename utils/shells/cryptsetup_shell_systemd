@@ -1,0 +1,34 @@
+#!/bin/sh
+
+get_ini_key()
+{
+    key="$1"
+    file="$2"
+    sed -n "/^${key}=/ s/^${key}=// p" "$file"
+}
+
+die()
+{
+    echo "$@" >&2
+    exit 1
+}
+
+for askfile in /run/systemd/ask-password/ask.*; do
+    [ -f "$askfile" ] || continue
+    msg=$(get_ini_key Message "$askfile")
+    socket=$(get_ini_key Socket "$askfile")
+    pid=$(get_ini_key PID "$askfile")
+
+    [ -n "$msg" -a -n "$socket" -a -n "$pid" ] || continue
+    kill -0 $pid || continue
+
+    stty -echo
+    read -p "$msg " passwd
+    echo "$passwd" | /lib/systemd/systemd-reply-password 1 "$socket"
+    exit 0
+
+done
+
+
+echo "Not ready to receive passphrase yet"
+exit 1
